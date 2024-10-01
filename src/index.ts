@@ -13,7 +13,7 @@ app.get('/redis', async (c) => {
     const config = {
       host: process.env.REDIS_HOST ?? 'localhost',
       port: Number.parseInt(process.env.REDIS_PORT ?? '6379'),
-      password: process.env.REDIS_PASSWORD ?? 'password',
+      password: process.env.REDIS_PASSWORD,
     }
     console.log(config)
     const redis = new Redis(config)
