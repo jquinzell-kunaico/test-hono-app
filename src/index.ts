@@ -10,22 +10,36 @@ app.get('/', (c) => {
 
 app.get('/redis', async (c) => {
   try {
-    const config = {
-      host: process.env.REDIS_HOST ?? 'localhost',
-      port: Number.parseInt(process.env.REDIS_PORT ?? '6379'),
-      password: process.env.REDIS_PASSWORD,
-      // tls: {
-      //   // Required for AWS ElastiCache
-      //   rejectUnauthorized: false,
-      // },
-      connectTimeout: 10000, // 10 seconds
-      retryStrategy: (times: number) => {
-        const delay = Math.min(times * 50, 2000)
-        return delay
-      },
-    }
-    console.log(config)
-    const redis = new Redis(config)
+    // const config = {
+    //   host: process.env.REDIS_HOST ?? 'localhost',
+    //   port: Number.parseInt(process.env.REDIS_PORT ?? '6379'),
+    //   password: process.env.REDIS_PASSWORD,
+    //   // tls: {
+    //   //   // Required for AWS ElastiCache
+    //   //   rejectUnauthorized: false,
+    //   // },
+    //   connectTimeout: 10000, // 10 seconds
+    //   retryStrategy: (times: number) => {
+    //     const delay = Math.min(times * 50, 2000)
+    //     return delay
+    //   },
+    // }
+    // console.log(config)
+    // const redis = new Redis(config)
+    const redis = new Redis.Cluster(
+      [
+        {
+          host: process.env.REDIS_HOST,
+          port: 6379,
+        },
+      ],
+      {
+        dnsLookup: (address, callback) => callback(null, address),
+        redisOptions: {
+          tls: {},
+        },
+      }
+    )
     redis.on('error', (err) => {
       console.error('Redis connection error:', err)
     })
